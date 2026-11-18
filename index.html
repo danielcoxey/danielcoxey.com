@@ -43,12 +43,22 @@
   .top nav{display:flex;gap:24px;font-size:.95rem}
   .top nav a{text-decoration:none;color:var(--ink-soft)}
   .top nav a:hover{color:var(--ink)}
+  [hidden]{display:none!important}
+
+  /* tabs: Professional / Passions */
+  .tabs{display:inline-flex;gap:2px;padding:3px;border:2px solid var(--ink);border-radius:999px;background:var(--chalk)}
+  .tabs button{appearance:none;border:0;margin:0;background:transparent;color:var(--ink-soft);font:600 .9rem/1 var(--body);padding:9px 18px;border-radius:999px;cursor:pointer;transition:background-color .15s ease,color .15s ease}
+  .tabs button:hover{color:var(--ink)}
+  .tabs button[aria-selected="true"]{background:var(--ink);color:var(--chalk)}
+  .tabs button:focus-visible{outline:3px solid var(--card);outline-offset:3px}
 
   /* hero */
   .hero{display:grid;grid-template-columns:1fr 1.05fr;gap:56px;align-items:center;padding:40px 0 72px}
   .hero h1{font:900 clamp(3rem,7.5vw,5.75rem)/.9 var(--display);font-stretch:62%;margin:0 0 24px;text-transform:uppercase;letter-spacing:-.005em}
   .hero .lede{font-size:1.25rem;line-height:1.5;max-width:30ch;margin:0 0 14px;font-weight:600}
   .hero .sub{color:var(--ink-soft);max-width:44ch;margin:0 0 28px}
+  .hero.solo{grid-template-columns:1fr}
+  .hero h2{margin-bottom:20px}
   .actions{display:flex;flex-wrap:wrap;gap:12px}
   .btn{display:inline-block;padding:12px 20px;border-radius:999px;font-weight:600;font-size:.95rem;text-decoration:none;border:2px solid var(--ink)}
   .btn.primary{background:var(--ink);color:var(--chalk)}
@@ -88,6 +98,7 @@
   /* projects */
   .proj{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) auto;gap:32px;padding:28px 0;border-bottom:1px solid var(--line);scroll-margin-top:24px}
   .proj:first-of-type{border-top:1px solid var(--line)}
+  section.proj-list{border-top:0;padding-top:0}
   .proj.hl{background:linear-gradient(90deg,rgba(239,192,46,.18),transparent 70%)}
   .proj h3{margin:0 0 8px;font:800 1.6rem/1.05 var(--display);font-stretch:85%}
   .status{display:inline-flex;align-items:center;gap:7px;font-size:.85rem;font-weight:600;color:var(--ink-soft)}
@@ -126,10 +137,15 @@
     .job{grid-template-columns:1fr;gap:4px}
     .top nav{gap:16px}
   }
+  @media (max-width:640px){
+    .top{flex-wrap:wrap;row-gap:16px}
+    .tabs{order:3;flex:1 1 100%}
+    .tabs button{flex:1}
+  }
   @media (prefers-reduced-motion:reduce){
     html{scroll-behavior:auto}
     .shot.enter{animation:none}
-    .shot,.shot .tip{transition:none}
+    .shot,.shot .tip,.tabs button{transition:none}
   }
 </style>
 </head>
@@ -138,15 +154,20 @@
   <header class="top">
     <!-- EDIT: your initials or name -->
     <a class="mark" href="#">Daniel Coxey</a>
+    <!-- Tabs: shown by the script; without JS both panels show stacked. Hashes: #professional, #passions -->
+    <div class="tabs" role="tablist" aria-label="Sections" hidden>
+      <button type="button" role="tab" id="tab-professional" aria-controls="panel-professional" aria-selected="true" data-tab="professional">Professional</button>
+      <button type="button" role="tab" id="tab-passions" aria-controls="panel-passions" aria-selected="false" tabindex="-1" data-tab="passions">Passions</button>
+    </div>
     <nav aria-label="Main">
-      <a href="#work">Work</a>
       <a href="#resume">Résumé</a>
       <a href="#contact">Contact</a>
     </nav>
   </header>
 
   <main>
-    <div class="hero">
+    <div id="panel-professional" role="tabpanel" aria-labelledby="tab-professional" data-tab="professional">
+    <div class="hero solo">
       <div>
         <!-- EDIT: your name -->
         <h1>Daniel<br>Coxey</h1>
@@ -159,34 +180,7 @@
           -->
         </div>
       </div>
-
-      <div class="pitch-wrap">
-        <div class="pitch" id="pitch" role="group" aria-label="Shot map of my projects. Select a dot to read about a project.">
-          <svg viewBox="0 0 680 525" fill="none" stroke="rgba(242,244,241,.75)" stroke-width="3" aria-hidden="true">
-            <rect x="6" y="6" width="668" height="513"/>
-            <rect x="138" y="6" width="404" height="165"/>
-            <rect x="248" y="6" width="184" height="55"/>
-            <path d="M269 171 A92 92 0 0 0 411 171"/>
-            <circle cx="340" cy="116" r="3.5" fill="rgba(242,244,241,.75)"/>
-            <path d="M248 519 A92 92 0 0 1 432 519"/>
-            <rect x="303" y="-4" width="74" height="10" fill="rgba(242,244,241,.9)" stroke="none"/>
-          </svg>
-        </div>
-        <div class="legend" aria-hidden="true">
-          <span><i class="f"></i>Shipped</span>
-          <span><i></i>Building now</span>
-          <span><i class="d"></i>On the training ground</span>
-          <span>Bigger dot, bigger project</span>
-        </div>
-        <div class="detail" id="detail" aria-live="polite"></div>
-      </div>
     </div>
-
-    <section id="work">
-      <h2>Projects</h2>
-      <p class="intro">One I've shipped, and the ones I'm building next. Most sit somewhere between a data pipeline and a sports fan's itch. One is about a medieval instrument.</p>
-      <div id="projects"></div>
-    </section>
 
     <section id="resume">
       <h2>Résumé</h2>
@@ -305,6 +299,43 @@
         </ul>
       </div>
     </section>
+    </div>
+
+    <div id="panel-passions" role="tabpanel" aria-labelledby="tab-passions" data-tab="passions">
+    <div class="hero" id="work">
+      <div>
+        <h2>Projects</h2>
+        <!-- EDIT: Passions intro line -->
+        <p class="lede">What I build on my own time, usually because I wanted the tool and nobody had made it yet.</p>
+        <p class="sub">One I've shipped, and the ones I'm building next. Most sit somewhere between a data pipeline and a sports fan's itch. One is about a medieval instrument.</p>
+      </div>
+
+      <div class="pitch-wrap">
+        <div class="pitch" id="pitch" role="group" aria-label="Shot map of my projects. Select a dot to read about a project.">
+          <svg viewBox="0 0 680 525" fill="none" stroke="rgba(242,244,241,.75)" stroke-width="3" aria-hidden="true">
+            <rect x="6" y="6" width="668" height="513"/>
+            <rect x="138" y="6" width="404" height="165"/>
+            <rect x="248" y="6" width="184" height="55"/>
+            <path d="M269 171 A92 92 0 0 0 411 171"/>
+            <circle cx="340" cy="116" r="3.5" fill="rgba(242,244,241,.75)"/>
+            <path d="M248 519 A92 92 0 0 1 432 519"/>
+            <rect x="303" y="-4" width="74" height="10" fill="rgba(242,244,241,.9)" stroke="none"/>
+          </svg>
+        </div>
+        <div class="legend" aria-hidden="true">
+          <span><i class="f"></i>Shipped</span>
+          <span><i></i>Building now</span>
+          <span><i class="d"></i>On the training ground</span>
+          <span>Bigger dot, bigger project</span>
+        </div>
+        <div class="detail" id="detail" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <section class="proj-list" aria-label="Project details">
+      <div id="projects"></div>
+    </section>
+    </div>
   </main>
 
   <footer>
@@ -367,6 +398,8 @@ PROJECTS.forEach((p, i) => {
   b.setAttribute("aria-label", `${p.name}, ${STATUS[p.status].toLowerCase()}`);
   b.innerHTML = `<span class="tip">${p.name}</span>`;
   b.addEventListener("click", () => select(p.id));
+  /* drop in once, the first time the Passions tab is shown (animations don't run while hidden) */
+  b.addEventListener("animationend", () => b.classList.remove("enter"), {once:true});
   pitch.appendChild(b);
   p.el = b;
 
@@ -393,6 +426,59 @@ function select(id){
 }
 select(PROJECTS[0].id);
 document.getElementById("yr").textContent = new Date().getFullYear();
+
+/* Tabs with hash routing. #professional / #passions pick a tab; any other #id
+   (e.g. #work, #resume, #contact, #p-soccer) opens the tab that contains it and scrolls to it. */
+const tablist = document.querySelector('[role="tablist"]');
+const tabs = [...tablist.querySelectorAll('[role="tab"]')];
+const panels = [...document.querySelectorAll('[role="tabpanel"]')];
+const TABS = tabs.map(t => t.dataset.tab);
+
+function show(name){
+  tabs.forEach(t => {
+    const on = t.dataset.tab === name;
+    t.setAttribute("aria-selected", on);
+    t.tabIndex = on ? 0 : -1;
+  });
+  panels.forEach(p => { p.hidden = p.dataset.tab !== name; });
+}
+
+function route(){
+  let h = location.hash.slice(1);
+  try { h = decodeURIComponent(h); } catch (e) {}
+  let name = TABS[0], target = null;
+  if (TABS.includes(h)) name = h;
+  else if (h){
+    target = document.getElementById(h);
+    const panel = target && target.closest('[role="tabpanel"]');
+    if (panel) name = panel.dataset.tab;
+  }
+  show(name);
+  if (target) target.scrollIntoView();
+}
+
+function activate(tab){
+  const name = tab.dataset.tab;
+  if (tab.getAttribute("aria-selected") !== "true" || location.hash.slice(1) !== name) location.hash = name;
+}
+
+tabs.forEach(t => t.addEventListener("click", () => activate(t)));
+tablist.addEventListener("keydown", e => {
+  const i = tabs.indexOf(document.activeElement);
+  if (i < 0) return;
+  let j;
+  if (e.key === "ArrowRight" || e.key === "ArrowDown") j = (i + 1) % tabs.length;
+  else if (e.key === "ArrowLeft" || e.key === "ArrowUp") j = (i - 1 + tabs.length) % tabs.length;
+  else if (e.key === "Home") j = 0;
+  else if (e.key === "End") j = tabs.length - 1;
+  else return;
+  e.preventDefault();
+  tabs[j].focus();
+  activate(tabs[j]);
+});
+window.addEventListener("hashchange", route);
+tablist.hidden = false;
+route();
 </script>
 </body>
 </html>
