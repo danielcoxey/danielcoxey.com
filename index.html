@@ -154,7 +154,9 @@
         <p class="sub">I've spent my career making data reliable: getting it in, cleaning it up and putting it where people can use it. These days I point that at betting markets, fantasy football and soccer match data.</p>
         <div class="actions">
           <a class="btn primary" href="#work">See my projects</a>
+          <!-- EDIT: restore when resume.pdf is added
           <a class="btn ghost" href="resume.pdf">Download résumé</a>
+          -->
         </div>
       </div>
 
@@ -188,7 +190,8 @@
 
     <section id="resume">
       <h2>Résumé</h2>
-      <p class="intro">The short version. The full one is a <a href="resume.pdf">PDF download</a>.</p>
+      <!-- EDIT: restore when resume.pdf is added: The full one is a <a href="resume.pdf">PDF download</a>. -->
+      <p class="intro">The short version.</p>
       <div class="resume">
         <div>
           <div class="job">
@@ -315,10 +318,10 @@
 const PROJECTS = [
   {
     id:"bet-verdict", name:"Bet Verdict", status:"shipped", size:3, x:48, y:15,
-    blurb:"A DFS betting intelligence site. Pulls player and market data together so you can judge a lineup or a prop before you play it. Started as a tool just for me and turned into a real product. A guest demo is coming soon, no sign-up needed.",
+    blurb:"A DFS betting intelligence site. Pulls player and market data together so you can judge a lineup or a prop before you play it. Started as a tool just for me and turned into a real product. Guest access to the demo is coming soon.",
     tags:["Python","Data pipelines","Sports betting","DFS"],
-    /* EDIT: put your Bet Verdict guest demo URL in demo when ready */
-    links:{demo:"", code:""}
+    /* EDIT: demo URL is set; revisit the blurb when guest access is live */
+    links:{demo:"https://demo.betverdict.app", code:""}
   },
   {
     id:"soccer", name:"Soccer analytics", status:"building", size:2, x:63, y:31,
