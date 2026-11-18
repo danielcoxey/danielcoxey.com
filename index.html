@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daniel Coxey — Data engineer</title>
+<meta name="description" content="Data engineer building sports analytics tools: betting intelligence, fantasy football and soccer match data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,300..900&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<!--
+  EDITING THIS SITE
+  - Your name, links and résumé text are plain HTML below (search for "EDIT").
+  - Projects live in the PROJECTS array in the <script> at the bottom.
+    x / y place the dot on the pitch (0–100, y=0 is the goal line).
+    size: 1–3 (how big the project is). status: "shipped" | "building" | "planned".
+  - Drop your résumé next to this file as resume.pdf and the button will work.
+-->
+<style>
+  :root{
+    --chalk:#F2F4F1;
+    --ink:#17202B;
+    --ink-soft:#4A5562;
+    --pitch:#2E6A4E;
+    --pitch-dark:#245A41;
+    --line:#C9D2CA;
+    --card:#EFC02E;
+    --display:"Anybody", "Arial Narrow", sans-serif;
+    --body:"Public Sans", system-ui, sans-serif;
+    --wrap:1120px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--chalk);color:var(--ink);font:400 1.0625rem/1.6 var(--body);-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration-thickness:1px;text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--pitch)}
+  :focus-visible{outline:3px solid var(--card);outline-offset:3px;border-radius:2px}
+  .wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+
+  /* header */
+  .top{display:flex;justify-content:space-between;align-items:center;padding:22px 0}
+  .mark{font:800 1.05rem/1 var(--display);font-stretch:125%;text-decoration:none;letter-spacing:.01em}
+  .top nav{display:flex;gap:24px;font-size:.95rem}
+  .top nav a{text-decoration:none;color:var(--ink-soft)}
+  .top nav a:hover{color:var(--ink)}
+
+  /* hero */
+  .hero{display:grid;grid-template-columns:1fr 1.05fr;gap:56px;align-items:center;padding:40px 0 72px}
+  .hero h1{font:900 clamp(3rem,7.5vw,5.75rem)/.9 var(--display);font-stretch:62%;margin:0 0 24px;text-transform:uppercase;letter-spacing:-.005em}
+  .hero .lede{font-size:1.25rem;line-height:1.5;max-width:30ch;margin:0 0 14px;font-weight:600}
+  .hero .sub{color:var(--ink-soft);max-width:44ch;margin:0 0 28px}
+  .actions{display:flex;flex-wrap:wrap;gap:12px}
+  .btn{display:inline-block;padding:12px 20px;border-radius:999px;font-weight:600;font-size:.95rem;text-decoration:none;border:2px solid var(--ink)}
+  .btn.primary{background:var(--ink);color:var(--chalk)}
+  .btn.primary:hover{background:var(--pitch);border-color:var(--pitch)}
+  .btn.ghost:hover{background:var(--ink);color:var(--chalk)}
+
+  /* the pitch */
+  .pitch-wrap{position:relative}
+  .pitch{position:relative;aspect-ratio:68/52.5;background:
+      repeating-linear-gradient(180deg,var(--pitch) 0 10%,var(--pitch-dark) 10% 20%);
+    border-radius:14px;overflow:hidden;box-shadow:0 1px 0 rgba(23,32,43,.08),0 18px 40px -24px rgba(23,32,43,.55)}
+  .pitch svg{position:absolute;inset:0;width:100%;height:100%}
+  .shot{position:absolute;transform:translate(-50%,-50%);border-radius:50%;border:2.5px solid var(--card);background:transparent;cursor:pointer;padding:0;transition:transform .18s ease, box-shadow .18s ease}
+  .shot.shipped{background:var(--card)}
+  .shot.planned{border-style:dashed}
+  .shot:hover,.shot[aria-pressed="true"]{transform:translate(-50%,-50%) scale(1.25);box-shadow:0 0 0 6px rgba(239,192,46,.28)}
+  .shot .tip{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);white-space:nowrap;background:var(--ink);color:var(--chalk);font:600 .78rem/1 var(--body);padding:6px 9px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .15s}
+  .shot:hover .tip,.shot:focus-visible .tip{opacity:1}
+  .legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font-size:.85rem;color:var(--ink-soft)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .legend i{width:12px;height:12px;border-radius:50%;border:2px solid var(--pitch);display:inline-block}
+  .legend i.f{background:var(--pitch)}
+  .legend i.d{border-style:dashed}
+  .detail{margin-top:18px;padding:18px 20px;background:#fff;border-radius:10px;border:1px solid var(--line);min-height:112px}
+  .detail h3{margin:0 0 4px;font:800 1.3rem/1.15 var(--display);font-stretch:90%}
+  .detail p{margin:0 0 8px;color:var(--ink-soft);font-size:.97rem}
+  .detail .meta{font-size:.85rem;color:var(--pitch);font-weight:600}
+
+  @keyframes drop{from{opacity:0;transform:translate(-50%,-140%) scale(.6)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+  .shot.enter{animation:drop .5s cubic-bezier(.2,.9,.3,1.3) both}
+
+  /* sections */
+  section{padding:72px 0;border-top:1px solid var(--line)}
+  h2{font:900 clamp(2rem,4.5vw,3rem)/1 var(--display);font-stretch:70%;text-transform:uppercase;margin:0 0 12px}
+  .intro{color:var(--ink-soft);max-width:56ch;margin:0 0 40px}
+
+  /* projects */
+  .proj{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) auto;gap:32px;padding:28px 0;border-bottom:1px solid var(--line);scroll-margin-top:24px}
+  .proj:first-of-type{border-top:1px solid var(--line)}
+  .proj.hl{background:linear-gradient(90deg,rgba(239,192,46,.18),transparent 70%)}
+  .proj h3{margin:0 0 8px;font:800 1.6rem/1.05 var(--display);font-stretch:85%}
+  .status{display:inline-flex;align-items:center;gap:7px;font-size:.85rem;font-weight:600;color:var(--ink-soft)}
+  .status i{width:10px;height:10px;border-radius:50%;border:2px solid var(--pitch)}
+  .status.shipped i{background:var(--pitch)}
+  .status.planned i{border-style:dashed}
+  .proj p{margin:0 0 12px;max-width:60ch}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+  .tags li{font-size:.8rem;padding:3px 9px;border-radius:999px;background:#E3E8E3;color:var(--ink)}
+  .links{display:flex;flex-direction:column;gap:6px;font-size:.92rem;font-weight:600;white-space:nowrap}
+
+  /* resume */
+  .resume{display:grid;grid-template-columns:1.6fr 1fr;gap:64px}
+  .job{display:grid;grid-template-columns:120px 1fr;gap:24px;padding:0 0 32px}
+  .job .when{font-size:.9rem;color:var(--ink-soft);padding-top:4px;font-variant-numeric:tabular-nums}
+  .job h3{margin:0;font:800 1.25rem/1.2 var(--display);font-stretch:90%}
+  .job .org{margin:2px 0 10px;color:var(--pitch);font-weight:600}
+  .job ul{margin:0;padding-left:18px;color:var(--ink-soft)}
+  .job li{margin-bottom:4px}
+  .side h3{font:800 1.1rem/1.2 var(--display);font-stretch:90%;margin:0 0 12px}
+  .side .tags{margin-bottom:32px}
+  .side p{color:var(--ink-soft);margin:0 0 32px}
+
+  /* contact */
+  .contact{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:32px}
+  .contact .big{font:900 clamp(2.4rem,6vw,4.5rem)/.95 var(--display);font-stretch:62%;text-transform:uppercase;margin:0}
+  .contact ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:1.05rem}
+  .contact ul span{color:var(--ink-soft);display:inline-block;width:84px;font-size:.9rem}
+  footer{padding:32px 0 48px;font-size:.85rem;color:var(--ink-soft);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr;gap:40px;padding-top:16px}
+    .proj{grid-template-columns:1fr;gap:12px}
+    .links{flex-direction:row;gap:18px}
+    .resume{grid-template-columns:1fr;gap:24px}
+    .job{grid-template-columns:1fr;gap:4px}
+    .top nav{gap:16px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .shot.enter{animation:none}
+    .shot,.shot .tip{transition:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <!-- EDIT: your initials or name -->
+    <a class="mark" href="#">Daniel Coxey</a>
+    <nav aria-label="Main">
+      <a href="#work">Work</a>
+      <a href="#resume">Résumé</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <!-- EDIT: your name -->
+        <h1>Daniel<br>Coxey</h1>
+        <p class="lede">Data engineer building analytics tools for sport.</p>
+        <p class="sub">I've spent my career making data reliable: getting it in, cleaning it up and putting it where people can use it. These days I point that at betting markets, fantasy football and soccer match data.</p>
+        <div class="actions">
+          <a class="btn primary" href="#work">See my projects</a>
+          <a class="btn ghost" href="resume.pdf">Download résumé</a>
+        </div>
+      </div>
+
+      <div class="pitch-wrap">
+        <div class="pitch" id="pitch" role="group" aria-label="Shot map of my projects. Select a dot to read about a project.">
+          <svg viewBox="0 0 680 525" fill="none" stroke="rgba(242,244,241,.75)" stroke-width="3" aria-hidden="true">
+            <rect x="6" y="6" width="668" height="513"/>
+            <rect x="138" y="6" width="404" height="165"/>
+            <rect x="248" y="6" width="184" height="55"/>
+            <path d="M269 171 A92 92 0 0 0 411 171"/>
+            <circle cx="340" cy="116" r="3.5" fill="rgba(242,244,241,.75)"/>
+            <path d="M248 519 A92 92 0 0 1 432 519"/>
+            <rect x="303" y="-4" width="74" height="10" fill="rgba(242,244,241,.9)" stroke="none"/>
+          </svg>
+        </div>
+        <div class="legend" aria-hidden="true">
+          <span><i class="f"></i>Shipped</span>
+          <span><i></i>Building now</span>
+          <span><i class="d"></i>On the training ground</span>
+          <span>Bigger dot, bigger project</span>
+        </div>
+        <div class="detail" id="detail" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <section id="work">
+      <h2>Projects</h2>
+      <p class="intro">One I've shipped, and the ones I'm building next. Most sit somewhere between a data pipeline and a sports fan's itch. One is about a medieval instrument.</p>
+      <div id="projects"></div>
+    </section>
+
+    <section id="resume">
+      <h2>Résumé</h2>
+      <p class="intro">The short version. The full one is a <a href="resume.pdf">PDF download</a>.</p>
+      <div class="resume">
+        <div>
+          <!-- EDIT: replace with your real roles, newest first -->
+          <div class="job">
+            <div class="when">2022 – now</div>
+            <div>
+              <h3>Data Engineer</h3>
+              <p class="org">Company name</p>
+              <ul>
+                <li>What you built or owned, with a number if you have one.</li>
+                <li>A pipeline, platform or migration you're proud of.</li>
+                <li>Who used your work and what it changed for them.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="job">
+            <div class="when">2019 – 2022</div>
+            <div>
+              <h3>Previous role</h3>
+              <p class="org">Company name</p>
+              <ul>
+                <li>Your strongest result in this role.</li>
+                <li>A tool or process you introduced.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="job">
+            <div class="when">Year</div>
+            <div>
+              <h3>Degree or certification</h3>
+              <p class="org">School</p>
+            </div>
+          </div>
+        </div>
+        <aside class="side">
+          <!-- EDIT: trim or extend to match your actual stack -->
+          <h3>Tools I use</h3>
+          <ul class="tags">
+            <li>Python</li><li>SQL</li><li>Data pipelines</li><li>Data modeling</li>
+            <li>FastAPI</li><li>React</li><li>Next.js</li><li>Git</li>
+          </ul>
+          <h3>How I work</h3>
+          <p>I build with AI coding tools every day, which means I spend less time on boilerplate and more on the data, the model and whether the thing is actually useful.</p>
+          <h3>Off the pitch</h3>
+          <p>I played soccer for years, which is why most of my side projects end up with a shot map in them somewhere. I also played drums back in the day, and I'm now learning the hurdy-gurdy from scratch.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="contact">
+        <p class="big">Let's talk<br>data.</p>
+        <!-- EDIT: your links -->
+        <ul>
+          <li><span>Email</span><a href="mailto:you@example.com">you@example.com</a></li>
+          <li><span>LinkedIn</span><a href="https://www.linkedin.com/in/your-handle">linkedin.com/in/your-handle</a></li>
+          <li><span>GitHub</span><a href="https://github.com/your-handle">github.com/your-handle</a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>© <span id="yr"></span> Daniel Coxey</span>
+    <span>Full time.</span>
+  </footer>
+</div>
+
+<script>
+/* EDIT: your projects. Links set to "" are hidden. */
+const PROJECTS = [
+  {
+    id:"bet-verdict", name:"Bet Verdict", status:"shipped", size:3, x:48, y:15,
+    blurb:"A DFS betting intelligence site. Pulls player and market data together so you can judge a lineup or a prop before you play it. Started as a tool just for me and turned into a real product. No sign-up needed: open the demo and look around.",
+    tags:["Python","Data pipelines","Sports betting","DFS"],
+    /* EDIT: put your Bet Verdict URL in demo */
+    links:{demo:"https://your-bet-verdict-url.com", code:""}
+  },
+  {
+    id:"soccer", name:"Soccer analytics", status:"building", size:2, x:63, y:31,
+    blurb:"Match analysis for a couple of top leagues: box scores, shot maps and lineup cards, with betting lines alongside for context. Analysis comes first; the odds are supporting information.",
+    tags:["FastAPI","Next.js","React","Soccer data"],
+    links:{demo:"", code:""}
+  },
+  {
+    id:"fantasy", name:"Season-long fantasy football", status:"building", size:2, x:30, y:38,
+    blurb:"Tools for season-long fantasy football: draft prep, roster decisions and the weekly start-or-sit call, built on the same data plumbing as Bet Verdict.",
+    tags:["Python","Fantasy football","Projections"],
+    links:{demo:"", code:""}
+  },
+  {
+    id:"hurdy-gurdy", name:"Hurdy-gurdy trainer", status:"planned", size:1, x:78, y:82,
+    blurb:"A longshot, hence the dot from 40 yards out. A learning tool for the hurdy-gurdy: fundamentals, sheet music, and transcription, so you play a song in and get hurdy-gurdy notation out. The long-term goal is modern arrangements that pair the hurdy-gurdy with foot-pedal kick and snare.",
+    tags:["Audio","Music transcription","Learning tool"],
+    links:{demo:"", code:""}
+  }
+];
+
+const STATUS = {shipped:"Shipped", building:"Building now", planned:"On the training ground"};
+const SIZE = [0, 18, 26, 36];
+const pitch = document.getElementById("pitch");
+const detail = document.getElementById("detail");
+const list = document.getElementById("projects");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function linksHTML(p){
+  const out = [];
+  if (p.links.demo) out.push(`<a href="${p.links.demo}">Try the demo</a>`);
+  if (p.links.code) out.push(`<a href="${p.links.code}">View code</a>`);
+  return out.join("");
+}
+
+PROJECTS.forEach((p, i) => {
+  const b = document.createElement("button");
+  b.className = `shot ${p.status}` + (reduce ? "" : " enter");
+  b.style.left = p.x + "%"; b.style.top = p.y + "%";
+  b.style.width = b.style.height = SIZE[p.size] + "px";
+  if (!reduce) b.style.animationDelay = (300 + i * 140) + "ms";
+  b.setAttribute("aria-pressed", "false");
+  b.setAttribute("aria-label", `${p.name}, ${STATUS[p.status].toLowerCase()}`);
+  b.innerHTML = `<span class="tip">${p.name}</span>`;
+  b.addEventListener("click", () => select(p.id));
+  pitch.appendChild(b);
+  p.el = b;
+
+  const row = document.createElement("article");
+  row.className = "proj"; row.id = "p-" + p.id;
+  row.innerHTML = `
+    <div><h3>${p.name}</h3><span class="status ${p.status}"><i></i>${STATUS[p.status]}</span></div>
+    <div><p>${p.blurb}</p><ul class="tags">${p.tags.map(t=>`<li>${t}</li>`).join("")}</ul></div>
+    <div class="links">${linksHTML(p)}</div>`;
+  list.appendChild(row);
+  p.row = row;
+});
+
+function select(id){
+  PROJECTS.forEach(p => {
+    const on = p.id === id;
+    p.el.setAttribute("aria-pressed", on);
+    p.row.classList.toggle("hl", on);
+    if (on){
+      detail.innerHTML = `<h3>${p.name}</h3><p>${p.blurb}</p>
+        <span class="meta">${STATUS[p.status]}</span> &nbsp; ${p.links.demo ? `<a href="${p.links.demo}">Try the demo</a> &nbsp; ` : ""}<a href="#p-${p.id}">More below</a>`;
+    }
+  });
+}
+select(PROJECTS[0].id);
+document.getElementById("yr").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
